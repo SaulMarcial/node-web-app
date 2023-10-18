@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: node-web-app-pipeline
+  namespace: node-web-project
+spec:
+  resources:
+    - name: node-web-app-source
+      type: git
+    - name: node-web-app-image
+      type: image
+  tasks:
+    - name: build-and-publish-image
+      params:
+        - name: BUILDER_IMAGE
+          value: 'quay.io/buildah/stable:v1.11.0'
+        - name: DOCKERFILE
+          value: ./Dockerfile
+        - name: TLSVERIFY
+          value: 'false'
+      resources:
+        inputs:
+          - name: source
+            resource: node-web-app-source
+        outputs:
+          - name: image
+            resource: node-web-app-image
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+    
