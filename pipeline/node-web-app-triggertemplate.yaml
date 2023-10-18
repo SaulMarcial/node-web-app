@@ -1,18 +1,18 @@
-apiVersion: triggers.tekton.dev/v1beta1
+apiVersion: triggers.tekton.dev/v1beta1 #apiVersion: tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: node-web-app-tt
 spec:
   params: 
   - name: git-repo-url
-    default: main
+    default: main # master
   - name: git-repo-name
   - name: git-revision
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: clone-build-push-priv-run-
+      generateName: node-web-app-pipeline-run-
     spec:
       serviceAccountName: build-bot
       pipelineRef:
@@ -34,15 +34,17 @@ spec:
           secretName: git-credentials
       - name: nexus-credentials
         secret:
-          secretName: nexus-credentials
+          secretName: docker-credentials-secret #nexus-credentials
       params:
-      - name: repo-url    value: https://github.com/kriztobal/react-tekton-argo.git
+      - name: repo-url
+        value: https://github.com/kriztobal/node-web-app.git # https://github.com/kriztobal/react-tekton-argo.git
       - name: image-reference
-        value: 192.168.162.161:8082/repository/project/test-app:1.0.1 
+        value: becariodocker/react-app:1.0.1 # 192.168.162.161:8082/repository/project/test-app:1.0.1
+
 
 --- 
 
-apiVersion: triggers.tekton.dev/v1beta1
+apiVersion: tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: node-web-app-tb
@@ -57,7 +59,7 @@ spec:
 
 ---
 
-apiVersion: triggers.tekton.dev/v1beta1
+apiVersion: tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: node-web-app-el
@@ -69,16 +71,16 @@ spec:
     template:
       name: node-web-app-tt
 
-# ---
+---
 
-# apiVersion: route.openshift.io/v1
-# kind: Route
-# metadata:
-#   name: el-node-web-app
-#   namespace: node-web-project
-# spec:
-#   host: el-node-web-app.apps.roly-ocp43-cluster.roly-ocp.com
-#   to:
-#     kind: Service
-#     name: el-node-web-app-el
-#     weight: 100
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: el-node-web-app
+  namespace: node-web-project
+spec:
+  host: el-node-web-app.apps.roly-ocp43-cluster.roly-ocp.com
+  to:
+    kind: Service
+    name: el-node-web-app-el
+    weight: 100

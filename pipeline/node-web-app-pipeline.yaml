@@ -1,31 +1,43 @@
-# apiVersion: tekton.dev/v1alpha1
-# kind: Pipeline
-# metadata:
-#   name: node-web-app-pipeline
-#   namespace: node-web-project
-# spec:
-#   resources:
-#     - name: node-web-app-source
-#       type: git
-#     - name: node-web-app-image
-#       type: image
-#   tasks:
-#     - name: build-and-publish-image
-#       params:
-#         - name: BUILDER_IMAGE
-#           value: 'quay.io/buildah/stable:v1.11.0'
-#         - name: DOCKERFILE
-#           value: ./Dockerfile
-#         - name: TLSVERIFY
-#           value: 'false'
-#       resources:
-#         inputs:
-#           - name: source
-#             resource: node-web-app-source
-#         outputs:
-#           - name: image
-#             resource: node-web-app-image
-#       taskRef:
-#         kind: ClusterTask
-#         name: buildah
-    
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: node-web-app-pipeline
+  namespace: node-web-project
+spec:
+  params: #resource:
+    - name: repo-url #node-web-app-source
+      type: string #git
+    - name: image-reference #node-web-app-image
+      type: string #image
+  workspaces:
+  - name: shared-data
+    description: Este espacio de trabajo contiene los archivos de repositorio clonados, por lo que pueden ser leídos por la siguiente tarea.
+  - name: nexus-credentials
+    description: Espacio de trabajo de mis credenciales de Docker en Nexus. 
+  - name: git-credentials
+    description: Espacio de trabajo de mis credenciales de Github. 
+  
+  tasks:
+  - name: fetch-source        ##### TASK 1 CLONAR CÓDIGO FUENTE DE GITHUB
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    - name: ssh-directory
+      workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.repo-url)
+  - name: build-push          ##### TASK 2 BUILD AND PUSH
+    runAfter: ["fetch-source"]
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data 
+    - name: dockerconfig 
+      workspace: nexus-credentials
+    params:   
+    - name: IMAGE 
+      value: $(params.image-reference) 
