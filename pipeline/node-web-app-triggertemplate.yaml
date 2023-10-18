@@ -2,6 +2,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: node-web-app-tt
+  namespace: node-web-project
 spec:
   params: 
   - name: git-repo-url

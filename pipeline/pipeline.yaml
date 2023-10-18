@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: node-web-app-pipeline
+  namespace: node-web-project
 spec:
   description: |
     Este pipeline clona un repositorio privado de Github, construye una imagen de Docker con Kaniko y la empuja al registro de DockerHub.
