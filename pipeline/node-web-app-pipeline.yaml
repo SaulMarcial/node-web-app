@@ -40,4 +40,22 @@ spec:
       workspace: nexus-credentials
     params:   
     - name: IMAGE 
-      value: $(params.image-reference) 
+      value: $(params.image-reference)      
+    # - name: build-and-publish-image
+    #   params:
+    #     - name: BUILDER_IMAGE
+    #       value: 'quay.io/buildah/stable:v1.11.0'
+    #     - name: DOCKERFILE
+    #       value: ./Dockerfile
+    #     - name: TLSVERIFY
+    #       value: 'false'
+    #   resources:
+    #     inputs:
+    #       - name: source
+    #         resource: node-web-app-source
+    #     outputs:
+    #       - name: image
+    #         resource: node-web-app-image
+    #   taskRef:
+    #     kind: ClusterTask
+    #     name: buildah

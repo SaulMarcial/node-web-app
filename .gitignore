@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+00-github-secret-argo.yaml
+01-docker-credentials.yaml
+02-github-secret.yaml
+03-serviceaccount.yaml
+04-nexus-cred-json.yaml
