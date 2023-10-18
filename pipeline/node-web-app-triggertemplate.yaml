@@ -5,7 +5,7 @@ metadata:
 spec:
   params: 
   - name: git-repo-url
-    default: master
+    default: main
   - name: git-repo-name
   - name: git-revision
   resourcetemplates:
