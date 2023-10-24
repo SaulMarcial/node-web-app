@@ -2,11 +2,11 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: node-web-app-pipeline
-  namespace: node-web-project
 spec:
   params: #resource:
     - name: repo-url #node-web-app-source
       type: string #git
+      description: La URL desde donde se va a clonar
     - name: image-reference #node-web-app-image
       type: string #image
   workspaces:
@@ -29,8 +29,8 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-  - name: build-push          ##### TASK 2 BUILD AND PUSH
-    runAfter: ["fetch-source"]
+  - name: build-push          ##### TASK 3 BUILD AND PUSH
+    runAfter: ["get-tag"]
     taskRef:
       name: kaniko
     workspaces:
@@ -41,21 +41,3 @@ spec:
     params:   
     - name: IMAGE 
       value: $(params.image-reference)      
-    # - name: build-and-publish-image
-    #   params:
-    #     - name: BUILDER_IMAGE
-    #       value: 'quay.io/buildah/stable:v1.11.0'
-    #     - name: DOCKERFILE
-    #       value: ./Dockerfile
-    #     - name: TLSVERIFY
-    #       value: 'false'
-    #   resources:
-    #     inputs:
-    #       - name: source
-    #         resource: node-web-app-source
-    #     outputs:
-    #       - name: image
-    #         resource: node-web-app-image
-    #   taskRef:
-    #     kind: ClusterTask
-    #     name: buildah

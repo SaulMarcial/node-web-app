@@ -11,7 +11,7 @@ const VERSION = process.env.VERSION || "0.0";
 // App
 const app = express();
 app.get('/', (req, res) => {
-  res.send('Hello RBC !!!!!!!  VERSION ${VERSION} ');
+  res.send('Hello 1.0.7 VERSION de prueba ${VERSION} ');
 });
 
 app.listen(PORT, HOST);

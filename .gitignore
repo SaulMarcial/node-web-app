@@ -5,3 +5,11 @@ npm-debug.log
 02-github-secret.yaml
 03-serviceaccount.yaml
 04-nexus-cred-json.yaml
+05-service-account-binding.yaml
+06-triggers-rbac.yaml
+# pipeline/node-web-app-pipeline.yaml
+07-latest-tag.txt
+08-items.json
+09-secret-tag.yaml
+10-secret-ip.yaml
+11-secret-port.yaml
