@@ -40,9 +40,9 @@ spec:
           secretName: nexus-credentials
       params:
       - name: repo-url
-        value: https://github.com/kriztobal/node-web-app.git # https://github.com/kriztobal/react-tekton-argo.git
+        value: https://github.com/SaulMarcial/node-web-app.git # https://github.com/kriztobal/react-tekton-argo.git
       - name: image-reference
-        value: 192.168.162.161:8082/repository/project/test-app:1.0.7
+        value: 192.168.6.140:8082/repository/project/test-app:1.0.1
 # Comentario de prueba MAIN con tag 1.0.7
 --- 
 
