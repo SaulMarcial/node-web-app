@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-sync-job
+  namespace: argocd
+spec:
+  template:
+    spec:
+      containers:
+      - name: pre-sync-container
+        image: alpine:latest
+        command: ["sh", "-c"]
+        args: ["./get_release.sh"]
+      restartPolicy: Never

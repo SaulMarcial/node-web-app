@@ -20,11 +20,13 @@ spec:
       selfHeal: true
       prune: true
     automated: {}
-  preSync:
-    hooks:
-    - name: get-git-release
-      container:
-        name: get-release
-        image: alpine:latest
-        command: ["sh", "-c"]
-        args: ["./get_release.sh"]
+
+  hooks:
+    - name: post-sync
+      type: OndemandJob
+      onRun:
+        resources:
+          - apiVersion: batch/v1
+            kind: Job
+            name: pre-sync-job
+            namespace: argocd
