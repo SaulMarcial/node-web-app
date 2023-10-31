@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  params:
+  - name: gitrevision  
+  selector:
+    matchLabels:
+      app: myapp
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: saulmls/react_v2 #192.168.162.160:8082/repository/docker-private/alpine-nexus:1.0.3 #  #  # saulmls/sample-pipeline:1.0.1 # becariodocker/react-app:latest
+        ports:
+        - containerPort: 3000
+      imagePullSecrets:
+      - name: project-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+  - port: 3000
+    protocol: TCP
+    targetPort: 3000

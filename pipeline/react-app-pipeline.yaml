@@ -1,0 +1,66 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: react-app-pipeline
+spec:
+  params:
+    - name: repo-url
+      type: string
+      description: La URL desde donde se va a clonar
+    - name: image-reference
+      type: string
+    - name: image-alpine
+      type: string
+  workspaces:
+  - name: shared-data
+    description: Este espacio de trabajo contiene los archivos de repositorio clonados, por lo que pueden ser leídos por la siguiente tarea.
+  - name: nexus-credentials
+    description: Espacio de trabajo de mis credenciales de Docker en Nexus. 
+  - name: git-credentials
+    description: Espacio de trabajo de mis credenciales de Github.
+  - name: nexus-pull
+    description: Espacio de trabajo de las credenciales de Nexus para el pull
+  
+  tasks:
+  - name: fetch-source        ##### TASK 1 CLONAR CÓDIGO FUENTE DE GITHUB
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    - name: ssh-directory
+      workspace: git-credentials
+    params:
+    - name: url
+      value: $(params.repo-url)
+
+  # - name: build-push          ##### TASK 2 BUILD AND PUSH
+  #   runAfter: ["fetch-source"]
+  #   taskRef:
+  #     name: kaniko
+  #   workspaces:
+  #   - name: source
+  #     workspace: shared-data 
+  #   - name: dockerconfig 
+  #     workspace: nexus-credentials
+  #   params:   
+  #   - name: IMAGE 
+  #     value: $(params.image-reference)
+
+  - name: get-release
+    runAfter: ["fetch-source"] #build-push]
+    workspaces:
+    - name: source
+      workspace: shared-data 
+    - name: dockerconfig 
+      workspace: nexus-pull # nexus-credentials
+    params:
+    - name: alpine-jq
+      value: $(params.image-alpine)
+    taskSpec:
+      steps:
+        - name: release-latest
+          image: 192.168.162.161:8082/repository/project/alpine-jq:1.0.1 # $(alpine-jq) # 
+          script: |
+            TAG_V1=$(curl -L   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer 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"   -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/kriztobal/react-tekton-argo/releases/latest | jq -r '.tag_name')
+            echo $TAG_V1

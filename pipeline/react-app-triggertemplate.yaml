@@ -1,0 +1,87 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: react-app-tt # pipeline-template
+spec:
+  params:
+  - name: gitrevision
+    description: The git revision
+    default: main
+  - name: gitrepositoryurl  # URL DE REPOSITORIO
+    description: The git repository url
+  - name: contenttype
+    description: The Content-Type of the event
+  # - name: CHAINS-GIT_COMMIT
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: react-app-pipeline-run-
+    spec:
+      serviceAccountName: build-bot
+      pipelineRef:
+        name: react-app-pipeline
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+      workspaces:
+      - name: shared-data
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
+      - name: git-credentials
+        secret:
+          secretName: git-credentials
+      - name: nexus-credentials
+        secret:
+          secretName: nexus-credentials
+      - name: nexus-pull
+        secret:
+          secretName: nexus-pull
+      params:
+      - name: release-repo
+        value: $(tt.params.gitrevision)
+      - name: repo-url
+        value: $(tt.params.gitrepositoryurl) # https://github.com/kriztobal/react-tekton-argo.git # 
+      - name: image-reference
+        value: 192.168.162.161:8082/repository/project/test-app:$(tt.params.gitrevision) #  1.0.31 # $(params.git-commit-hash) # 
+      - name: image-alpine
+        value: 192.168.162.161:8082/repository/project/alpine-jq:1.0.1
+--- 
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: react-app-tb # pipeline-binding
+spec:
+  params:
+  - name: gitrevision
+    value: $(body.release.tag_name) # $(body.release.target_commitish) # $(body.pull_request.head.sha) # $(body.head_commit.id)
+  - name: gitrepositoryurl
+    value: "https://github.com/$(body.repository.full_name)" # $(body.repository.url)
+  - name: contenttype
+    value: $(header.Content-Type)
+  # - name: CHAINS-GIT_COMMIT
+    # value: $(tasks.checkout.results.commit)
+
+---
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: react-app-el # eventlistener
+spec:
+  serviceAccountName: tekton-triggers-example-sa # trigger-sa
+  triggers:
+    - name: trigger
+      # interceptors:
+      #   - github:
+      #       eventTypes: ["pull_request"]
+      bindings:
+        - ref: react-app-tb # pipeline-binding
+      template:
+        ref: react-app-tt # pipeline-template

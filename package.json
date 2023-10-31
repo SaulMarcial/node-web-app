@@ -1,13 +1,35 @@
 {
-  "name": "node_web_app",
+  "name": "react-webpack-setup",
   "version": "1.0.0",
-  "description": "Node.js on Docker",
-  "author": "Roland Barcia",
-  "main": "server.js",
+  "description": "Simple step by step walkthrough of setting up a React app with Webpack",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "build": "webpack --mode production",
+    "start": "webpack serve --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsramblings/react-webpack-setup.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsramblings/react-webpack-setup/issues"
+  },
+  "homepage": "https://github.com/jsramblings/react-webpack-setup#readme",
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-react": "^7.17.12",
+    "babel-loader": "^8.2.5",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.1"
   },
   "dependencies": {
-    "express": "^4.16.1"
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
   }
 }

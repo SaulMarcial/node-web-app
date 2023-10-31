@@ -1,14 +1,16 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: node-web-app-pipeline
+  name: clone-build-push-priv
 spec:
-  params: #resource:
-    - name: repo-url #node-web-app-source
-      type: string #git
-      description: La URL desde donde se va a clonar
-    - name: image-reference #node-web-app-image
-      type: string #image
+  description: |
+    Este pipeline clona un repositorio privado de Github, construye una imagen de Docker con Kaniko y la empuja al registro de DockerHub.
+  params:
+  - name: repo-url
+    type: string
+    description: La URL del repositorio que se va a clonar.
+  - name: image-reference
+    type: string
   workspaces:
   - name: shared-data
     description: Este espacio de trabajo contiene los archivos de repositorio clonados, por lo que pueden ser leídos por la siguiente tarea.
@@ -16,7 +18,6 @@ spec:
     description: Espacio de trabajo de mis credenciales de Docker en Nexus. 
   - name: git-credentials
     description: Espacio de trabajo de mis credenciales de Github. 
-  
   tasks:
   - name: fetch-source        ##### TASK 1 CLONAR CÓDIGO FUENTE DE GITHUB
     taskRef:
@@ -29,8 +30,8 @@ spec:
     params:
     - name: url
       value: $(params.repo-url)
-  - name: build-push          ##### TASK 3 BUILD AND PUSH
-    runAfter: ["get-tag"]
+  - name: build-push          ##### TASK 2 BUILD AND PUSH
+    runAfter: ["fetch-source"]
     taskRef:
       name: kaniko
     workspaces:
@@ -40,4 +41,4 @@ spec:
       workspace: nexus-credentials
     params:   
     - name: IMAGE 
-      value: $(params.image-reference)      
+      value: $(params.image-reference)
