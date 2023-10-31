@@ -2,14 +2,23 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: my-app
+  namespace: argocd
 spec:
+  project: default
+
   source:
     repoURL: https://github.com/SaulMarcial/node-web-app.git
-    path: deployment
+    targetRevision: HEAD
+    path: argo
   destination:
     namespace: default
     server: https://kubernetes.default.svc
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true
     automated: {}
   preSync:
     hooks:
