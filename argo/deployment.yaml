@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: saulmls/react_v2 #192.168.162.160:8082/repository/docker-private/alpine-nexus:1.0.3 #  #  # saulmls/sample-pipeline:1.0.1 # becariodocker/react-app:latest
+        image: saulmls/react_v2
         ports:
         - containerPort: 3000
       imagePullSecrets:
